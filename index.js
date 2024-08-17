@@ -30,8 +30,9 @@ async function run() {
 
 
    app.get('/products', async (req, res) => {
-    const result = await productCollection.find().toArray();
-    
+    const searchQuery = req.query.search || '';
+    const query = searchQuery ? { productName: { $regex: searchQuery, $options: 'i' } } : {};
+    const result = await productCollection.find(query).toArray();
     res.send(result);
    })
     // Send a ping to confirm a successful connection
