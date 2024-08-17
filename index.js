@@ -31,9 +31,20 @@ async function run() {
 
    app.get('/products', async (req, res) => {
     const searchQuery = req.query.search || '';
-    const query = searchQuery ? { productName: { $regex: searchQuery, $options: 'i' } } : {};
-    const result = await productCollection.find(query).toArray();
-    res.send(result);
+        const brandQuery = Array.isArray(req.query.brand) ? req.query.brand : req.query.brand ? [req.query.brand] : [];
+        const categoryQuery = Array.isArray(req.query.category) ? req.query.category : req.query.category ? [req.query.category] : [];
+        const minPrice = parseFloat(req.query.minPrice) || 0;
+        const maxPrice = parseFloat(req.query.maxPrice) || 1500;
+
+        const query = {
+            ...(searchQuery && { productName: { $regex: searchQuery, $options: 'i' } }),
+            ...(brandQuery.length > 0 && { brandName: { $in: brandQuery } }),
+            ...(categoryQuery.length > 0 && { category: { $in: categoryQuery } }),
+            price: { $gte: minPrice, $lte: maxPrice },
+        };
+
+        const result = await productCollection.find(query).toArray();
+        res.send(result);
    })
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
