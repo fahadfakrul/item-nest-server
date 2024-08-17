@@ -36,15 +36,31 @@ async function run() {
         const minPrice = parseFloat(req.query.minPrice) || 0;
         const maxPrice = parseFloat(req.query.maxPrice) || 1500;
 
+        const page = parseInt(req.query.page) || 1; // Current page
+  const limit = parseInt(req.query.limit) || 10; // Items per page
+  const skip = (page - 1) * limit; // Calculate how many items to skip
+
         const query = {
             ...(searchQuery && { productName: { $regex: searchQuery, $options: 'i' } }),
             ...(brandQuery.length > 0 && { brandName: { $in: brandQuery } }),
             ...(categoryQuery.length > 0 && { category: { $in: categoryQuery } }),
             price: { $gte: minPrice, $lte: maxPrice },
         };
-
-        const result = await productCollection.find(query).toArray();
-        res.send(result);
+        const totalItems = await productCollection.countDocuments(query);
+        const totalPages = Math.ceil(totalItems / limit);
+      
+        const products = await productCollection
+          .find(query)
+          .skip(skip)
+          .limit(limit)
+          .toArray();
+      
+        res.send({
+          products,
+          currentPage: page,
+          totalPages,
+          totalItems,
+        });
    })
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
