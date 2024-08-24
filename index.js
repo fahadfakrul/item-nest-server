@@ -4,7 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
 const corsOptions = {
-  origin: ["http://localhost:5173", "http://localhost:5174","https://item-nest-3d760.web.app","https://item-nest-3d760.firebaseapp.com"],
+  origin: ["http://localhost:5173","http://localhost:5174","https://item-nest-3d760.web.app","https://item-nest-3d760.firebaseapp.com"],
   credentials: true,
   optionSuccessStatus: 200,
 };
