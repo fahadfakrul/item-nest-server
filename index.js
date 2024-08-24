@@ -9,7 +9,7 @@ const corsOptions = {
   optionSuccessStatus: 200,
 };
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const { MongoClient, ServerApiVersion } = require("mongodb");
